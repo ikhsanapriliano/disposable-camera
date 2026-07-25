@@ -45,6 +45,8 @@ export function captureFrameWithVintageFilter(
   return loadImage(frameUrl).then((frame) => {
     const vw = video.videoWidth || width;
     const vh = video.videoHeight || height;
+    const sLandscape = window.innerWidth > window.innerHeight;
+    const vLandscape = vw > vh;
 
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = vw;
@@ -57,12 +59,26 @@ export function captureFrameWithVintageFilter(
     finalCanvas.height = frame.height;
     const ctx = finalCanvas.getContext("2d")!;
 
-    if (flipHorizontal) {
+    // ponytail: orientation fix — raw video dims may differ from screen orientation
+    if (vLandscape !== sLandscape) {
+      ctx.save();
+      ctx.translate(finalCanvas.width / 2, finalCanvas.height / 2);
+      ctx.rotate(vLandscape ? (Math.PI / 2) : (-Math.PI / 2));
+      ctx.translate(-finalCanvas.height / 2, -finalCanvas.width / 2);
+      if (flipHorizontal) {
+        ctx.translate(finalCanvas.height, 0);
+        ctx.scale(-1, 1);
+      }
+      ctx.drawImage(tempCanvas, 0, 0, finalCanvas.height, finalCanvas.width);
+      ctx.restore();
+    } else if (flipHorizontal) {
       ctx.translate(finalCanvas.width, 0);
       ctx.scale(-1, 1);
+      ctx.drawImage(tempCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    } else {
+      ctx.drawImage(tempCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
     }
-    ctx.drawImage(tempCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     ctx.drawImage(frame, 0, 0);
 
