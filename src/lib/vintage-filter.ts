@@ -40,11 +40,15 @@ export function captureFrameWithVintageFilter(
   width: number,
   height: number,
   frameUrl: string,
+  flipHorizontal: boolean,
 ): Promise<Blob> {
   return loadImage(frameUrl).then((frame) => {
+    const vw = video.videoWidth || width;
+    const vh = video.videoHeight || height;
+
     const tempCanvas = document.createElement("canvas");
-    tempCanvas.width = width;
-    tempCanvas.height = height;
+    tempCanvas.width = vw;
+    tempCanvas.height = vh;
 
     applyVintageFilter(video, tempCanvas);
 
@@ -53,8 +57,13 @@ export function captureFrameWithVintageFilter(
     finalCanvas.height = frame.height;
     const ctx = finalCanvas.getContext("2d")!;
 
-    // ponytail: fill entire canvas, frame PNG opaque areas cover edges
-    ctx.drawImage(tempCanvas, 0, 0, frame.width, frame.height);
+    if (flipHorizontal) {
+      ctx.translate(finalCanvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+    ctx.drawImage(tempCanvas, 0, 0, finalCanvas.width, finalCanvas.height);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
     ctx.drawImage(frame, 0, 0);
 
     return new Promise<Blob>((resolve, reject) => {

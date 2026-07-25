@@ -143,6 +143,7 @@ export default function CameraPage() {
         isMobile
           ? "/images/mobile-frame-camera.png"
           : "/images/desktop-frame-camera.png",
+        facingMode === "user",
       );
 
       const file = new File([blob], `${Date.now()}.jpg`, {
