@@ -291,11 +291,11 @@ export default function CameraPage() {
           className="absolute inset-0 w-full h-full object-contain hidden"
         />
 
-        <div className="absolute top-4 left-0 right-0 flex justify-center z-20">
+        {/* <div className="absolute top-4 left-0 right-0 flex justify-center z-20">
           <div className="bg-black/50 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs text-white/80">
             {event?.nama_acara || "Kamera Pernikahan"}
           </div>
-        </div>
+        </div> */}
 
         <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
           <button

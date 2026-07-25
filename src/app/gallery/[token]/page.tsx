@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import JSZip from "jszip";
 import { supabase } from "@/lib/supabase";
 import { Event, Photo } from "@/lib/types";
 
@@ -31,6 +32,7 @@ export default function GalleryPage() {
   const [countdown, setCountdown] = useState("");
   const [isRevealed, setIsRevealed] = useState(false);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadingAll, setDownloadingAll] = useState(false);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
   const fetchEventAndPhotos = useCallback(async () => {
@@ -112,6 +114,30 @@ export default function GalleryPage() {
     }
   };
 
+  const downloadAll = async () => {
+    setDownloadingAll(true);
+    try {
+      const zip = new JSZip();
+      const blobs = await Promise.all(
+        photos.map((p) => fetch(p.url_foto).then((r) => r.blob())),
+      );
+      blobs.forEach((blob, i) => {
+        zip.file(`foto-${i + 1}.jpg`, blob);
+      });
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `foto-${event?.nama_acara || "kenangan"}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } finally {
+      setDownloadingAll(false);
+    }
+  };
+
   const openViewer = (idx: number) => setViewerIndex(idx);
   const closeViewer = () => setViewerIndex(null);
   const goNext = () => setViewerIndex((prev) => (prev! + 1) % photos.length);
@@ -178,12 +204,21 @@ export default function GalleryPage() {
               {photos.length} foto kenangan
             </p>
           </div>
-          <Link
+          <div className="flex items-center gap-3">
+            <button
+              onClick={downloadAll}
+              disabled={downloadingAll || photos.length === 0}
+              className="text-xs text-film-accent/70 hover:text-film-accent disabled:opacity-50"
+            >
+              {downloadingAll ? "Mengunduh..." : "Unduh Semua"}
+            </button>
+            <Link
             href={`/${token}`}
             className="text-xs text-film-accent/70 hover:text-film-accent underline"
           >
             Kamera
           </Link>
+          </div>
         </div>
       </header>
 
