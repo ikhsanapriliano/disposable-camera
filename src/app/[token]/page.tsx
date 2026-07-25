@@ -212,7 +212,8 @@ export default function CameraPage() {
             {event.nama_acara}
           </h2>
           <p className="text-film-muted text-sm leading-relaxed mb-1">
-            Selamat datang! Kamu bisa mengambil hingga {MAX_PHOTOS} foto di acara ini.
+            Selamat datang! Kamu bisa mengambil hingga {MAX_PHOTOS} foto di
+            acara ini.
           </p>
           <p className="text-film-muted/50 text-xs mb-6">
             Foto akan tersimpan rahasia dan bisa dilihat setelah acara selesai.
@@ -230,9 +231,10 @@ export default function CameraPage() {
   }
 
   if (showThanks) {
-    const galleryUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/gallery/${token}`
-      : "";
+    const galleryUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/gallery/${token}`
+        : "";
 
     return (
       <main className="min-h-dvh flex flex-col items-center justify-center px-6 text-center bg-black">
@@ -245,8 +247,8 @@ export default function CameraPage() {
             Kamu sudah mengambil {photoCount} foto di acara ini.
           </p>
           <p className="text-film-muted/50 text-xs mb-6">
-            Foto-foto akan bisa dilihat setelah acara selesai.
-            Nanti buka lagi link yang sama ya!
+            Foto-foto akan bisa dilihat setelah acara selesai. Nanti buka lagi
+            link yang sama ya!
           </p>
           <a
             href={galleryUrl}
@@ -271,18 +273,22 @@ export default function CameraPage() {
           autoPlay
           playsInline
           muted
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
         />
 
         <img
-          src={isMobile ? "/images/mobile-frame-camera.png" : "/images/desktop-frame-camera.png"}
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
+          src={
+            isMobile
+              ? "/images/mobile-frame-camera.png"
+              : "/images/desktop-frame-camera.png"
+          }
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none z-10"
           alt=""
         />
 
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full object-cover hidden"
+          className="absolute inset-0 w-full h-full object-contain hidden"
         />
 
         <div className="absolute top-4 left-0 right-0 flex justify-center">
@@ -317,14 +323,14 @@ export default function CameraPage() {
         </div>
       )}
 
-      <div className="pb-8 pt-4 flex flex-col items-center gap-3 bg-gradient-to-t from-black via-black to-transparent">
+      <div className="absolute  bg-black/80 bottom-0 left-0 right-0 pb-8 pt-6 flex flex-col items-center gap-3 z-20 bg-gradient-to-t from-black/40 via-black/20 to-transparent">
         <button
           onClick={takePhoto}
           disabled={uploading || photoCount >= MAX_PHOTOS}
           className={`w-20 h-20 rounded-full border-[3px] transition-all duration-200 flex items-center justify-center
             ${
               uploading || photoCount >= MAX_PHOTOS
-                ? "border-film-muted/30 bg-film-muted/20"
+                ? "border-film-muted bg-film-muted/20"
                 : "border-white bg-white/20 hover:bg-white/30 active:scale-95"
             }`}
           aria-label="Ambil foto"
@@ -337,7 +343,7 @@ export default function CameraPage() {
             }`}
           />
         </button>
-        <p className="text-white/50 text-xs">
+        <p className="text-white text-xs">
           {photoCount >= MAX_PHOTOS
             ? "Batas foto tercapai. Terima kasih!"
             : `${MAX_PHOTOS - photoCount} foto tersisa`}
@@ -345,7 +351,7 @@ export default function CameraPage() {
         {photoCount > 0 && (
           <button
             onClick={() => setShowThanks(true)}
-            className="px-6 py-2 bg-film-accent/20 border border-film-accent/40 text-film-accent rounded-full text-sm hover:bg-film-accent/30 transition-colors"
+            className="px-6 py-2 bg-film-accent border border-film-accent/40 text-white rounded-full text-sm hover:bg-film-accent/30 transition-colors"
           >
             Selesai
           </button>
