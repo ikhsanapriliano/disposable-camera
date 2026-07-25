@@ -275,6 +275,7 @@ export default function CameraPage() {
           playsInline
           muted
           className="absolute inset-0 w-full h-full object-contain"
+          style={facingMode === "user" ? { transform: "scaleX(-1)" } : undefined}
         />
 
         <img
