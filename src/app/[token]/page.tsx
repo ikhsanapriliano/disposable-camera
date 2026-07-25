@@ -41,6 +41,12 @@ export default function CameraPage() {
     "environment",
   );
   const [showThanks, setShowThanks] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
 
   useEffect(() => {
     const stored = parseInt(
@@ -107,9 +113,10 @@ export default function CameraPage() {
   );
 
   useEffect(() => {
+    if (showIntro) return;
     startCamera(facingMode);
     return () => stopCamera();
-  }, [facingMode, startCamera, stopCamera]);
+  }, [facingMode, startCamera, stopCamera, showIntro]);
 
   const switchCamera = () => {
     setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
@@ -133,7 +140,9 @@ export default function CameraPage() {
           (1600 * (videoRef.current.videoHeight || 720)) /
             (videoRef.current.videoWidth || 1280),
         ),
-        event?.nama_acara,
+        isMobile
+          ? "/images/mobile-frame-camera.png"
+          : "/images/desktop-frame-camera.png",
       );
 
       const file = new File([blob], `${Date.now()}.jpg`, {
@@ -194,6 +203,32 @@ export default function CameraPage() {
     );
   }
 
+  if (showIntro && event) {
+    return (
+      <main className="min-h-dvh flex flex-col items-center justify-center px-6 text-center bg-black">
+        <div className="max-w-sm">
+          <div className="text-5xl mb-4">&#x1F4F8;</div>
+          <h2 className="text-2xl font-serif text-film-accent mb-2">
+            {event.nama_acara}
+          </h2>
+          <p className="text-film-muted text-sm leading-relaxed mb-1">
+            Selamat datang! Kamu bisa mengambil hingga {MAX_PHOTOS} foto di acara ini.
+          </p>
+          <p className="text-film-muted/50 text-xs mb-6">
+            Foto akan tersimpan rahasia dan bisa dilihat setelah acara selesai.
+            Jangan lupa tersenyum ya!
+          </p>
+          <button
+            onClick={() => setShowIntro(false)}
+            className="px-6 py-3 bg-film-accent text-black rounded-full text-sm font-medium hover:bg-film-accent/90 transition-colors"
+          >
+            Buka Kamera
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   if (showThanks) {
     const galleryUrl = typeof window !== "undefined"
       ? `${window.location.origin}/gallery/${token}`
@@ -239,13 +274,10 @@ export default function CameraPage() {
           className="absolute inset-0 w-full h-full object-cover"
         />
 
-        <div className="absolute inset-[8%_10%] border-[3px] border-[#d4c5a9]/70 shadow-[inset_0_0_60px_rgba(0,0,0,0.4)] pointer-events-none" />
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%)",
-          }}
+        <img
+          src={isMobile ? "/images/mobile-frame-camera.png" : "/images/desktop-frame-camera.png"}
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-10"
+          alt=""
         />
 
         <canvas

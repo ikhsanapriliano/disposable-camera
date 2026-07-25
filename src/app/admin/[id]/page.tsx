@@ -16,6 +16,13 @@ export default function AdminEventPage() {
   const [loading, setLoading] = useState(true);
   const [revealing, setRevealing] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
+
+  const copyLink = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(label);
+    setTimeout(() => setCopied(null), 1500);
+  };
 
   const fetchEvent = useCallback(async () => {
     const { data, error } = await supabase
@@ -167,7 +174,13 @@ export default function AdminEventPage() {
   const galleryLink = `${baseUrl}/gallery/${event.link_token}`;
 
   return (
-    <main className="min-h-dvh pb-8">
+    <>
+      <main className="min-h-dvh pb-8">
+      {copied && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-4 py-2 rounded-lg text-sm shadow-lg animate-fade-in">
+          Link {copied} berhasil disalin!
+        </div>
+      )}
       <header className="sticky top-0 z-10 bg-film-bg/95 backdrop-blur-sm border-b border-white/5 px-4 py-3">
         <div className="max-w-xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -265,21 +278,37 @@ export default function AdminEventPage() {
           <div className="space-y-2">
             <div>
               <p className="text-xs text-film-muted/70 mb-1">Link Kamera:</p>
-              <input
-                readOnly
-                value={cameraLink}
-                className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/70 focus:outline-none"
-                onClick={(e) => (e.target as HTMLInputElement).select()}
-              />
+              <div className="flex gap-2">
+                <input
+                  readOnly
+                  value={cameraLink}
+                  className="flex-1 bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/70 focus:outline-none"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <button
+                  onClick={() => copyLink(cameraLink, "kamera")}
+                  className="px-3 py-2 bg-film-accent/20 border border-film-accent/50 text-film-accent rounded-lg text-xs hover:bg-film-accent/30 transition-colors whitespace-nowrap"
+                >
+                  {copied === "kamera" ? "Tersalin!" : "Salin"}
+                </button>
+              </div>
             </div>
             <div>
               <p className="text-xs text-film-muted/70 mb-1">Link Galeri:</p>
-              <input
-                readOnly
-                value={galleryLink}
-                className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/70 focus:outline-none"
-                onClick={(e) => (e.target as HTMLInputElement).select()}
-              />
+              <div className="flex gap-2">
+                <input
+                  readOnly
+                  value={galleryLink}
+                  className="flex-1 bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/70 focus:outline-none"
+                  onClick={(e) => (e.target as HTMLInputElement).select()}
+                />
+                <button
+                  onClick={() => copyLink(galleryLink, "galeri")}
+                  className="px-3 py-2 bg-film-accent/20 border border-film-accent/50 text-film-accent rounded-lg text-xs hover:bg-film-accent/30 transition-colors whitespace-nowrap"
+                >
+                  {copied === "galeri" ? "Tersalin!" : "Salin"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -311,5 +340,15 @@ export default function AdminEventPage() {
         </div>
       </div>
     </main>
+      <style jsx>{`
+        @keyframes fade-in {
+          0% { opacity: 0; transform: translate(-50%, -10px); }
+          100% { opacity: 1; transform: translate(-50%, 0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+      `}</style>
+    </>
   );
 }
